@@ -69,28 +69,52 @@ export default function App() {
 
     const stepThroughCell = (row, column) =>{
       // If you have visited [row, column] return
-      if(grid[row][column]){
-        return
-      }
+
+      // console.log(grid[row][column])
+      // if(grid[row][column]){
+      //   return
+      // }
+
+      grid[row][column] ? grid[row][column] = true : grid[row][column] = false
+
       // // Mark cell as visited
       grid[row][column] = true
       //  Assemble randomly-ordered list of neighbors
-      const top = [row-1, column]
-      const right = [row, column+1]
-      const bottom = [row+1, column]
-      const left = [row, column-1]
-      const neighbors = shuffle([top, right,bottom,left])
-      console.log(neighbors)
+      const up = [row-1, column, 'up']
+      const right = [row, column+1, 'right']
+      const down = [row+1, column, 'down']
+      const left = [row, column-1, 'left']
+      const neighbors = shuffle([up, right, down,left])
 
       //  For Each neighbor
+      for(let neighbor of neighbors){
+        const [nextRow, nextColumn, direction] = neighbor
 
       // See if neighbor is out of bounds
-
+        if(nextRow < 0 || nextRow >= cells || nextColumn < 0 || nextColumn >= cells){
+          continue;
+        }
       // if you have visited that neighbor, continue to next neighbor
-
+        if(grid[nextRow][nextColumn]){
+          continue;
+        }
       // Visit next Cell
+        if(direction === 'left'){
+          verticals[row][column -1] = true
+        }
+        else if(direction === 'right'){
+          verticals[row][column] = true
+        }
+        else if(direction === 'up'){
+          verticals[row - 1][column] = true
+        }
+        else if(direction === 'down'){
+          verticals[row][column] = true
+        }
+      }
     }
     stepThroughCell(startRow, startColumn)
+
     // stepThroughCell(1, 1)
 
 
@@ -106,7 +130,6 @@ export default function App() {
 
   return (
     <div>
-      {console.log(grid)}
     </div>
   )
 }
