@@ -1,42 +1,42 @@
 import React, {useState, useEffect} from 'react'
 import Matter from "matter-js";
-import {Random} from "random-js";
 
 export default function App() {
   const [state, setstate] = useState({})
 
-  useEffect(() => {
-    
-    // const cells = 3
-    const cells = Math.floor(Math.random() * (10 - 5 + 1) + 5)
-    
-    const startRow = Math.floor(Math.random() * cells)
-    const startColumn = Math.floor(Math.random() * cells)
 
-    const stepThroughCell = (row, column) =>{
-      // If you have visited [row, column] return
+  const cells = 3
+// const cells = Math.floor(Math.random() * (10 - 5 + 1) + 5)
+  const grid = Array(3).fill(null)
+                        .map(()=> Array(cells).fill(false));
 
-      // Mark cell as visited
+  const verticals = Array(cells).fill(null)
+                                .map(()=>Array(cells - 1 ).fill(false))
 
-      //  Assemble randomly-ordered list of neighbors
+  const horizonatals = Array(cells-1).fill(null)
+                                     .map(()=>Array(cells).fill(false))
 
-      //  For Each neighbor
 
-      // See if neighbor is out of bounds
 
-      // if you have visited that neighbor, continue to next neighbor
 
-      // Visit next Cell
+  const startValGen = ()=>  Math.floor(Math.random() * cells)
+  const startRow = startValGen()
+  const startColumn = startValGen()
+
+  const shuffle=(arr)=>{
+    let counter = arr.length
+
+    while(counter > 0){
+      const index = Math.floor(Math.random() * counter)
+      // counter--
+      counter-=1
+      const temp = arr[counter]
+      arr[counter] = arr[index]
+      arr[index] = temp
     }
-
-    const grid = Array(3).fill(null)
-                         .map(()=> Array(cells).fill(false));
-
-    const verticals = Array(cells).fill(null)
-                            .map(()=>Array(cells - 1 ).fill(false))
-
-    const horizonatals = Array(cells-1).fill(null)
-                            .map(()=>Array(cells).fill(false))
+    return arr
+  }
+  useEffect(() => {
 
     const {Engine, Render, Runner, World, Bodies} = Matter
 
@@ -65,23 +65,48 @@ export default function App() {
 
     Render.run(render);
     Runner.run(Runner.create(), engine)
-
-
-
     World.add(world, walls)
 
+    const stepThroughCell = (row, column) =>{
+      // If you have visited [row, column] return
+      if(grid[row][column]){
+        return
+      }
+      // // Mark cell as visited
+      grid[row][column] = true
+      //  Assemble randomly-ordered list of neighbors
+      const top = [row-1, column]
+      const right = [row, column+1]
+      const bottom = [row+1, column]
+      const left = [row, column-1]
+      const neighbors = shuffle([top, right,bottom,left])
+      console.log(neighbors)
 
-    console.log( Bodies)
-    console.log(grid)
-    console.log(horizonatals)
-    console.log(verticals)
-    console.log(startColumn)
-    console.log(startRow)
+      //  For Each neighbor
+
+      // See if neighbor is out of bounds
+
+      // if you have visited that neighbor, continue to next neighbor
+
+      // Visit next Cell
+    }
+    stepThroughCell(startRow, startColumn)
+    // stepThroughCell(1, 1)
+
+
+    // console.log( Bodies)
+    // console.log(horizonatals)
+    // console.log(verticals)
+    // console.log(startColumn)
+    // console.log(startRow)
+    // console.log(startValGen())
+    //     console.log(startColumn)
+    // console.log(startRow)
   }, [])
 
   return (
     <div>
-      
+      {console.log(grid)}
     </div>
   )
 }
