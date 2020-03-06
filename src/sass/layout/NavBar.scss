@@ -1,0 +1,10 @@
+.nav-bar{
+    background-color: red;
+    justify-content: center;
+    text-align: center;
+    &--title{
+        // text-align: center;
+        color: burlywood;
+        background-color: red($color: #000000);
+    }
+}
