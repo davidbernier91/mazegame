@@ -137,7 +137,9 @@ export default function App() {
             label: 'wall',
             isStatic: true,
             render: {
-              fillStyle: wallColor
+              fillStyle: wallColor,
+              visible: true
+              
             }
           }
         );
