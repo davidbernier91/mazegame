@@ -1,127 +1,179 @@
 import React, {useState, useEffect} from 'react'
 import Matter from "matter-js";
+import randomColor from 'randomcolor'; // import the script
+// const color = randomColor(); // a hex code for an attractive color
 
 export default function App() {
-  const [state, setstate] = useState({})
+  const [wallColor, setWallColor] = useState(randomColor())
+  const [backGroundColor, setBackgrundColor] = useState(randomColor())
 
+  const [cells, setCells] = useState({horizontal:14, vertical:10})
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const [grid, setGrid] = useState(Array(cells.vertical).fill(null).map(() => Array(cells.horizontal).fill(false)))
+  const [unitLengthX, setUnitXLength] = useState(width / cells.horizontal)
+  const [unitLengthY, setUnitLengthY] = useState(height / cells.vertical)
 
-  const cells = 3
-// const cells = Math.floor(Math.random() * (10 - 5 + 1) + 5)
-  const grid = Array(cells)
-                .fill(null)
-                .map(()=> Array(cells).fill(false));
+  const verticals = Array(cells.vertical)
+                          .fill(null)
+                          .map(() => Array(cells.horizontal - 1).fill(false));
 
-  const verticals = Array(cells)
-                    .fill(null)
-                    .map(()=>Array(cells - 1 ).fill(false))
+  const horizontals = Array(cells.vertical - 1)
+                            .fill(null)
+                            .map(() => Array(cells.horizontal).fill(false));
 
-  const horizontals = Array(cells-1).fill(null)
-                                    .map(()=>Array(cells).fill(false))
+    const startRow = Math.floor(Math.random() * cells.vertical);
+    const startColumn = Math.floor(Math.random() * cells.horizontal);
 
-
-
-
-  const startValGen = ()=>  Math.floor(Math.random() * cells)
-  const startRow = startValGen()
-  const startColumn = startValGen()
-
-  const shuffle=(arr)=>{
-    let counter = arr.length
-
-    while(counter > 0){
-      const index = Math.floor(Math.random() * counter)
-      // counter--
-      counter--
-      const temp = arr[counter]
-      arr[counter] = arr[index]
-      arr[index] = temp
-    }
-    return arr
-  }
   useEffect(() => {
-
-    const {Engine, Render, Runner, World, Bodies} = Matter
-
-    const width = 800
-    const height = 800
+    const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
     const engine = Engine.create();
-    const {world} = engine;
+    engine.world.gravity.y = 0;
+    const { world } = engine;
     const render = Render.create({
       element: document.body,
       engine: engine,
-      options:{
-        width: width,
-        height:height,
-        wireframes: false
+      options: {
+        wireframes: false,
+        width,
+        height,
+        background: backGroundColor
       }
-    })
-
-    // walls --> top, bottom, left, right
-    const walls =[
-      Bodies.rectangle((width/2), 0, width, 40, {isStatic:true}),
-      Bodies.rectangle((width/2), height, 800, 40, {isStatic:true}),
-      Bodies.rectangle(0, (height/2), 40, height, {isStatic:true}),
-      Bodies.rectangle(width, (height/2), 40, height, {isStatic:true}),
-    ]
-
+    });
     Render.run(render);
-    Runner.run(Runner.create(), engine)
-    World.add(world, walls)
+    Runner.run(Runner.create(), engine);
 
-    const stepThroughCell = (row, column) =>{
-      // If you have visited [row, column] return
-      if(grid[row][column]){
-        return
+    // Walls
+    const walls = [
+      Bodies.rectangle(width / 2, 0, width, 2, { isStatic: true }),
+      Bodies.rectangle(width / 2, height, width, 2, { isStatic: true }),
+      Bodies.rectangle(0, height / 2, 2, height, { isStatic: true }),
+      Bodies.rectangle(width, height / 2, 2, height, { isStatic: true })
+    ];
+    World.add(world, walls);
+
+    // Maze generation
+
+    const shuffle = arr => {
+      let counter = arr.length;
+
+      while (counter > 0) {
+        const index = Math.floor(Math.random() * counter);
+
+        counter--;
+
+        const temp = arr[counter];
+        arr[counter] = arr[index];
+        arr[index] = temp;
+      }
+      return arr;
+    };
+
+    const stepThroughCell = (row, column) => {
+      // If i have visted the cell at [row, column], then return
+      if (grid[row][column]) {
+        return;
       }
 
-      // // Mark cell as visited
-      grid[row][column] = true
-      //  Assemble randomly-ordered list of neighbors
+      // Mark this cell as being visited
+      grid[row][column] = true;
+
+      // Assemble randomly-ordered list of neighbors
       const neighbors = shuffle([
         [row - 1, column, 'up'],
         [row, column + 1, 'right'],
         [row + 1, column, 'down'],
         [row, column - 1, 'left']
       ]);
+      // For each neighbor....
+      for (let neighbor of neighbors) {
+        const [nextRow, nextColumn, direction] = neighbor;
 
-      //  For Each neighbor
-      for(let neighbor of neighbors){
-        const [nextRow, nextColumn, direction] = neighbor
-
-      // See if neighbor is out of bounds
-        if((nextRow < 0) ||
-         (nextRow >= cells) ||
-         (nextColumn < 0) || 
-         (nextColumn >= cells)){
-          continue;
-        }
-      // if you have visited that neighbor, continue to next neighbor
-        if(grid[nextRow][nextColumn]){
+        // See if that neighbor is out of bounds
+        if (
+          nextRow < 0 ||
+          nextRow >= cells.vertical ||
+          nextColumn < 0 ||
+          nextColumn >= cells.horizontal
+        ) {
           continue;
         }
 
-   // Remove a wall from either horizontals or verticals
-        if (direction === 'left'){
+        // If we have visited that neighbor, continue to next neighbor
+        if (grid[nextRow][nextColumn]) {
+          continue;
+        }
+
+        // Remove a wall from either horizontals or verticals
+        if (direction === 'left') {
           verticals[row][column - 1] = true;
-        } else if (direction === 'right'){
+        } else if (direction === 'right') {
           verticals[row][column] = true;
-        } else if (direction === 'up'){
+        } else if (direction === 'up') {
           horizontals[row - 1][column] = true;
-        } else if (direction === 'down'){
+        } else if (direction === 'down') {
           horizontals[row][column] = true;
         }
+
+        stepThroughCell(nextRow, nextColumn);
       }
-    }
-    stepThroughCell(startRow, startColumn)
-    verticals.map((something)=>console.log(something))
-    horizontals.map((something)=>console.log(something))
-    // console.log("verticals", verticals)
-    // console.log("horizontals", horizontals)
+    };
+
+    stepThroughCell(startRow, startColumn);
+
+    horizontals.forEach((row, rowIndex) => {
+      row.forEach((open, columnIndex) => {
+        if (open) {
+          return;
+        }
+
+        const wall = Bodies.rectangle(
+          columnIndex * unitLengthX + unitLengthX / 2,
+          rowIndex * unitLengthY + unitLengthY,
+          unitLengthX,
+          5,
+          {
+            label: 'wall',
+            isStatic: true,
+            render: {
+              fillStyle: wallColor
+            }
+          }
+        );
+        World.add(world, wall);
+      });
+    });
+
+    verticals.forEach((row, rowIndex) => {
+      row.forEach((open, columnIndex) => {
+        if (open) {
+          return;
+        }
+
+        const wall = Bodies.rectangle(
+          columnIndex * unitLengthX + unitLengthX,
+          rowIndex * unitLengthY + unitLengthY / 2,
+          5,
+          unitLengthY,
+          {
+            label: 'wall',
+            isStatic: true,
+            render: {
+              fillStyle: wallColor
+            }
+          }
+        );
+        World.add(world, wall);
+      });
+    });
   }, [])
 
   return (
     <div>
+
     </div>
   )
 }
+
+
