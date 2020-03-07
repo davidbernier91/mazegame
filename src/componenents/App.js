@@ -1,15 +1,18 @@
 import React, {useState, useEffect} from 'react'
 import Matter from "matter-js";
 import randomColor from 'randomcolor'; // import the script
+import NavBar from './NavBar';
 // const color = randomColor(); // a hex code for an attractive color
 
 export default function App() {
+  const [bool, setBool] = useState(false)
   const [wallColor, setWallColor] = useState(randomColor())
   const [backGroundColor, setBackgrundColor] = useState(randomColor())
 
   const [cells, setCells] = useState({horizontal:14, vertical:10})
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+  const [width, setWidth] = useState(window.innerWidth)
+  const [height, setHeight] = useState(window.innerHeight)
+
   const [grid, setGrid] = useState(Array(cells.vertical).fill(null).map(() => Array(cells.horizontal).fill(false)))
   const [unitLengthX, setUnitXLength] = useState(width / cells.horizontal)
   const [unitLengthY, setUnitLengthY] = useState(height / cells.vertical)
@@ -26,6 +29,7 @@ export default function App() {
     const startColumn = Math.floor(Math.random() * cells.horizontal);
 
   useEffect(() => {
+
     const { Engine, Render, Runner, World, Bodies, Body, Events } = Matter;
 
     const engine = Engine.create();
@@ -73,7 +77,7 @@ export default function App() {
     const stepThroughCell = (row, column) => {
       // If i have visted the cell at [row, column], then return
       if (grid[row][column]) {
-        return;
+        return; 
       }
 
       // Mark this cell as being visited
@@ -169,10 +173,28 @@ export default function App() {
         World.add(world, wall);
       });
     });
+    
+    // Goal
+  const goal = Bodies.rectangle(
+    width - unitLengthX / 2,
+    height - unitLengthY / 2,
+    unitLengthX * 0.7,
+    unitLengthY * 0.7,
+    {
+      label: 'goal',
+      isStatic: true,
+      render: {
+        fillStyle: 'green'
+      }
+    }
+  );
+  World.add(world, goal);
+
   }, [])
 
   return (
-    <div>
+    <div on>
+      {/* <NavBar/> */}
 
     </div>
   )
