@@ -190,7 +190,40 @@ export default function App() {
   );
   World.add(world, goal);
 
+    // Ball
+
+  const ballRadius = Math.min(unitLengthX, unitLengthY) / 4;
+  const ball = Bodies.circle(unitLengthX / 2, unitLengthY / 2, ballRadius, {
+    label: 'ball',
+    render: {
+      fillStyle: 'blue'
+    }
+  });
+  World.add(world, ball);
+
+  document.addEventListener('keydown', event => {
+    const { x, y } = ball.velocity;
+
+    if (event.keyCode === 87) {
+      Body.setVelocity(ball, { x, y: y - 5 });
+    }
+
+    if (event.keyCode === 68) {
+      Body.setVelocity(ball, { x: x + 5, y });
+    }
+
+    if (event.keyCode === 83) {
+      Body.setVelocity(ball, { x, y: y + 5 });
+    }
+
+    if (event.keyCode === 65) {
+      Body.setVelocity(ball, { x: x - 5, y });
+    }
+  });
+
   }, [])
+
+
 
   return (
     <div on>
