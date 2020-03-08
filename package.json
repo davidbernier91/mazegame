@@ -11,7 +11,9 @@
     "random-js": "^2.1.0",
     "randomcolor": "^0.5.4",
     "react": "^16.13.0",
+    "react-color": "^2.18.0",
     "react-dom": "^16.13.0",
+    "react-modal": "^3.11.2",
     "react-scripts": "3.4.0",
     "sass": "^1.26.2"
   },
