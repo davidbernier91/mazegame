@@ -11,7 +11,7 @@ export default function Maze() {
     
         const numGen = (max, min)=> Math.floor(Math.random() * (max - min + 1) + min)
         const [cells, setCells] = useState({horizontal:numGen(56, 14), vertical: numGen(40,10)})
-        const [width, setWidth] = useState(window.innerWidth*0.80 )
+        const [width, setWidth] = useState(window.innerWidth )
         const [height, setHeight] = useState(window.innerHeight )
 
         const [grid, setGrid] = useState(Array(cells.vertical).fill(null).map(() => Array(cells.horizontal).fill(false)))
