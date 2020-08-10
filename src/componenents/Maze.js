@@ -8,7 +8,7 @@ export default function Maze() {
         const [backGroundColor, setBackgrundColor] = useState(randomColor())
         const [ballColor, setBallColor] = useState(randomColor())
         const [finishColor, setfinishColor] = useState(randomColor())
-    
+
         const numGen = (max, min)=> Math.floor(Math.random() * (max - min + 1) + min)
         const [cells, setCells] = useState({horizontal:numGen(56, 14), vertical: numGen(40,10)})
         const [width, setWidth] = useState(window.innerWidth )
